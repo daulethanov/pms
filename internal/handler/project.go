@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"todo/internal/model/schema"
+	"todo/internal/service"
 )
 
 type ProjectHandlerInterface interface{
@@ -11,7 +12,13 @@ type ProjectHandlerInterface interface{
 }
 
 type ProjectHandler struct{
+	service service.ProjectServiceInterface
+}
 
+func NewProjectHandler(service service.ProjectServiceInterface)ProjectHandlerInterface{
+	return &ProjectHandler{
+		service: service,
+	}
 }
 
 func (p *ProjectHandler) CreateProjectRoom(w http.ResponseWriter, r *http.Request) {
@@ -22,6 +29,11 @@ func (p *ProjectHandler) CreateProjectRoom(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
 	}
-	
+	if err := p.service.CreateProject(&body);err != nil{
+		http.Error(w, "Ошибка при создание проекта", http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+
 }
 

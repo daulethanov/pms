@@ -20,9 +20,9 @@ func main() {
 	if err != nil{
 		log.Fatal("Error connect mongo")
 	}
-
+	projects_collection := mongo.Database("db").Collection("projects")
 	users_collection := mongo.Database("db").Collection("users")
-	if err = serve.HttpServer(users_collection); err != nil {
+	if err = serve.HttpServer(users_collection, projects_collection); err != nil {
 		log.Fatal("Error start http server")
 	}
 	
