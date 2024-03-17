@@ -5,6 +5,6 @@ mongo:
   password: "admin"
   
 minio:
-  endpoint: "http://127.0.0.1:9000"
+  endpoint: "127.0.0.1:9000"
   secret-key: "aIJkqHj3syTBtKuLyk6ijaCXwvRNnuVDd3HBGUt3"
   access-key: "9nHluHVlvUzTCh18jLEg"

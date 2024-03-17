@@ -22,7 +22,7 @@ func NewMinioClient() (*minio.Client, error) {
 	}
 	minioClient, err := minio.New(config.endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(config.accessKey, config.secretKey, ""),
-		Secure: true,
+		Secure: false,
 	})
 	if err != nil {
 		log.Fatalln(err)

@@ -14,13 +14,10 @@ type User struct{
 	Password string `bson:"password"`
 	CretedAt time.Time `bson:"created_at"`
 	Active bool `bson:"active"`
+	InviteLink string `bson:"invite_link"`	
+	Image string `bson:"image"`
 }
 
-type Profile struct{
-	ID primitive.ObjectID `bson:"_id"`
-	UserID User `bson:"user_id"`
-	InviteLink string `bson:"invite_link"`
-}
 
 
 func (u *User)  PasswordHash(password string)  error {

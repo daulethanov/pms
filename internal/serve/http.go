@@ -1,16 +1,17 @@
 package serve
 
 import (
-	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"todo/internal/handler"
 	"todo/internal/service"
+	"github.com/gorilla/mux"
+	"github.com/minio/minio-go/v7"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func HttpServer(userCollection, projectCollection *mongo.Collection) error {
+func HttpServer(userCollection, projectCollection *mongo.Collection, minio *minio.Client) error {
 	router := mux.NewRouter()
-	authService := service.NewAuthService(userCollection)
+	authService := service.NewAuthService(userCollection, minio)
 	authHandler := handler.NewAuthHandler(authService)
 
 	projectService := service.NewProjectService(projectCollection)
@@ -32,7 +33,9 @@ func HttpServer(userCollection, projectCollection *mongo.Collection) error {
 		{
 			auth.Handle("/profile", handler.BaseMiddleware(
 				http.HandlerFunc(profileHandler.ViewProfile))).Methods("GET")
-		}
+			auth.Handle("/profile/edit/image", handler.BaseMiddleware(
+				http.HandlerFunc(profileHandler.EditImageProfile))).Methods("POST")
+		}	
 		project := api.PathPrefix("/project").Subrouter()
 		{
 			project.Handle("/create", handler.BaseMiddleware(
