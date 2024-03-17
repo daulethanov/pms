@@ -8,7 +8,7 @@ import (
 type Room struct {
 	ID            primitive.ObjectID   `bson:"_id"`
 	UsersID       []primitive.ObjectID `bson:"users"`
-	InvaiteLink   string               `bson:"invite_link"`
+	InviteLink    string               `bson:"invite_link"`
 }
 
 func (r *Room) CreateInviteLink() string {

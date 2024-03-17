@@ -1,22 +1,23 @@
 package serve
 
 import (
+	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"todo/internal/handler"
 	"todo/internal/service"
-	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-
 
 func HttpServer(userCollection, projectCollection *mongo.Collection) error {
 	router := mux.NewRouter()
 	authService := service.NewAuthService(userCollection)
 	authHandler := handler.NewAuthHandler(authService)
-	
+
 	projectService := service.NewProjectService(projectCollection)
 	projectHandler := handler.NewProjectHandler(projectService)
+
+
+	roomHandler := handler.NewRoomHandler()
 
 	api := router.PathPrefix("/api").Subrouter()
 	{
@@ -31,6 +32,12 @@ func HttpServer(userCollection, projectCollection *mongo.Collection) error {
 		{
 			project.Handle("/create", handler.BaseMiddleware(
 				http.HandlerFunc(projectHandler.CreateProjectRoom))).Methods("POST")
+			project.Handle("/detail/{id}", handler.BaseMiddleware(
+				http.HandlerFunc(projectHandler.DetailProjectView))).Methods("GET")
+		}
+		room := api.PathPrefix("/room").Subrouter()
+		{
+			room.HandleFunc("", roomHandler.RoomMessage)
 		}
 	}
 
