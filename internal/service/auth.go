@@ -15,6 +15,7 @@ type AuthServiceInterface interface {
 	CreateUser(email string, password string) (string, error)
 	LoginUser(email string, password string) (string, error)
 	EmailValidate(email string) error
+	ViewProfile(id string) (*model.User, error)
 }
 
 type AuthService struct {
@@ -90,3 +91,15 @@ func (a *AuthService) LoginUser(email string, password string) (string, error) {
     return userID, nil
 }
 
+
+func (a *AuthService) ViewProfile(id string) (*model.User, error){
+	var user model.User
+	userID , err := primitive.ObjectIDFromHex(id)
+	if err != nil{
+		return nil, err
+	}
+	
+    err = a.userCollection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&user)
+
+	return &user, nil 
+}

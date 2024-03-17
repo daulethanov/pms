@@ -17,6 +17,7 @@ func HttpServer(userCollection, projectCollection *mongo.Collection) error {
 	projectHandler := handler.NewProjectHandler(projectService)
 
 
+	profileHandler := handler.NewProfileHandler(authService)
 	roomHandler := handler.NewRoomHandler()
 
 	api := router.PathPrefix("/api").Subrouter()
@@ -26,8 +27,12 @@ func HttpServer(userCollection, projectCollection *mongo.Collection) error {
 			auth.HandleFunc("/sign-up", authHandler.SignUp).Methods("POST")
 			auth.HandleFunc("/sign-in", authHandler.SignIn).Methods("POST")
 			auth.HandleFunc("/refresh", authHandler.NewJwtToken).Methods("POST")
+		
 		}
-
+		{
+			auth.Handle("/profile", handler.BaseMiddleware(
+				http.HandlerFunc(profileHandler.ViewProfile))).Methods("GET")
+		}
 		project := api.PathPrefix("/project").Subrouter()
 		{
 			project.Handle("/create", handler.BaseMiddleware(

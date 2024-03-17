@@ -4,6 +4,7 @@ import (
 	"log"
 	"todo/config"
 	"todo/internal/serve"
+	"todo/pkg/minio"
 	"todo/pkg/mongo"
 )
 
@@ -19,6 +20,10 @@ func main() {
 	mongo, err := mongo.NewMongoClient()
 	if err != nil{
 		log.Fatal("Error connect mongo")
+	}
+	_, err = minio.NewMinioClient()
+	if err != nil{
+		log.Fatal("Error connect minio")
 	}
 	projects_collection := mongo.Database("db").Collection("projects")
 	users_collection := mongo.Database("db").Collection("users")
