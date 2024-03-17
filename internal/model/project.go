@@ -8,6 +8,7 @@ import (
 
 type Project struct {
 	ID            primitive.ObjectID   `bson:"_id"`
+	UserID        primitive.ObjectID   `bson:"user_id"`
 	RoomID        primitive.ObjectID   `bson:"room_id"`               
 	Name          string               `bson:"name"`
 	General       bool                 `bson:"general"`

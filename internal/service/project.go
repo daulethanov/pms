@@ -32,6 +32,7 @@ func (p *ProjectService) CreateProject(body *schema.CreateProjectSchema)error{
 		CretedAt: time.Now(),
 		Name: body.Name,
 		General: body.General,
+		
 	}
 
 	_, err := p.projectCollection.InsertOne(context.TODO(), project)

@@ -29,7 +29,8 @@ func HttpServer(userCollection, projectCollection *mongo.Collection) error {
 
 		project := api.PathPrefix("/project").Subrouter()
 		{
-			project.HandleFunc("/create", projectHandler.CreateProjectRoom).Methods("POST")
+			project.Handle("/create", handler.BaseMiddleware(
+				http.HandlerFunc(projectHandler.CreateProjectRoom))).Methods("POST")
 		}
 	}
 
