@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"time"
 	"todo/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"go.mongodb.org/mongo-driver/bson"
@@ -98,7 +97,9 @@ func (a *AuthService) ViewProfile(id string) (*model.User, error) {
 	}
 
 	err = a.userCollection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&user)
-
+	if err != nil{
+		return nil, err
+	}
 	return &user, nil
 }
 
@@ -106,6 +107,9 @@ func (a *AuthService) EditImageProfile(userID string, imageFile multipart.File, 
 	ctx := context.Background()
 	profileBucket := "image"
 	userID_hex, err  := primitive.ObjectIDFromHex(userID)
+	if err != nil{
+		return err
+	}
 	objectName := uuid.New().String()
 
 	_, err = a.minioClient.PutObject(ctx, profileBucket, objectName, imageFile, size, minio.PutObjectOptions{
@@ -114,8 +118,11 @@ func (a *AuthService) EditImageProfile(userID string, imageFile multipart.File, 
 	if err != nil {
 		return err
 	}
-    imageURL, err := a.minioClient.PresignedGetObject(ctx, profileBucket, objectName, time.Second*24*60*60, nil)
 
+    imageURL, err := a.minioClient.PresignedGetObject(ctx, profileBucket, objectName, 0, nil)
+	if err != nil {
+        return err
+    }
     _, err = a.userCollection.UpdateOne(ctx, bson.M{"_id": userID_hex}, bson.M{"$set": bson.M{"image": imageURL.String()}})
     if err != nil {
         return err
@@ -123,3 +130,4 @@ func (a *AuthService) EditImageProfile(userID string, imageFile multipart.File, 
 	
 	return nil
 }
+

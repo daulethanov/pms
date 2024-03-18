@@ -27,7 +27,8 @@ func main() {
 	}
 	projects_collection := mongo.Database("db").Collection("projects")
 	users_collection := mongo.Database("db").Collection("users")
-	if err = serve.HttpServer(users_collection, projects_collection, minioClient); err != nil {
+	task_level_collection := mongo.Database("db").Collection("task_level")
+	if err = serve.HttpServer(users_collection, projects_collection,task_level_collection, minioClient); err != nil {
 		log.Fatal("Error start http server")
 	}
 	

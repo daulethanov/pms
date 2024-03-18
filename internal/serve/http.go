@@ -9,12 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func HttpServer(userCollection, projectCollection *mongo.Collection, minio *minio.Client) error {
+func HttpServer(userCollection, projectCollection, taskLevelCollection *mongo.Collection, minio *minio.Client) error {
 	router := mux.NewRouter()
 	authService := service.NewAuthService(userCollection, minio)
 	authHandler := handler.NewAuthHandler(authService)
 
-	projectService := service.NewProjectService(projectCollection)
+	projectService := service.NewProjectService(projectCollection, taskLevelCollection)
 	projectHandler := handler.NewProjectHandler(projectService)
 
 

@@ -122,6 +122,7 @@ func (a *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
 func (a *AuthHandler) NewJwtToken(w http.ResponseWriter, r *http.Request){
 	decoder := json.NewDecoder(r.Body)
 	body := schema.NewTokenSchema{} 

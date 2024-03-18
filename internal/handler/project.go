@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"todo/internal/model/schema"
 	"todo/internal/service"
+
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 type ProjectHandlerInterface interface{
+	TaskEdit(w http.ResponseWriter, r *http.Request)
 	CreateProjectRoom(w http.ResponseWriter, r *http.Request)
 	DetailProjectView(w http.ResponseWriter, r *http.Request)
 }
@@ -22,6 +25,10 @@ func NewProjectHandler(service service.ProjectServiceInterface)ProjectHandlerInt
 		service: service,
 	}
 }
+
+
+
+
 
 func (p *ProjectHandler) CreateProjectRoom(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
@@ -64,4 +71,19 @@ func (p *ProjectHandler) DetailProjectView(w http.ResponseWriter, r *http.Reques
         http.Error(w, "Ошибка отправки данных", http.StatusInternalServerError)
         return
     }
+}
+
+func (p *ProjectHandler) TaskEdit(w http.ResponseWriter, r *http.Request){
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil{ 
+		http.Error(w, "Ошибка отправки данных", http.StatusInternalServerError)
+        return
+	}
+	defer conn.Close()
+	
+	
 }
