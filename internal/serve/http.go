@@ -29,7 +29,8 @@ func HttpServer(userCollection, projectCollection, taskLevelCollection *mongo.Co
 			auth.HandleFunc("/sign-in", authHandler.SignIn).Methods("POST")
 			auth.HandleFunc("/refresh", authHandler.NewJwtToken).Methods("POST")
 			auth.HandleFunc("/edit/password", profileHandler.EditPassword).Methods("POST")
-		
+			auth.HandleFunc("/edit/password/code", profileHandler.EditPasswordCode).Methods("POST")
+			auth.HandleFunc("/edit/password/confirm/{slug}", profileHandler.EditPasswordConfirm).Methods("POST")
 		}
 		{
 			auth.Handle("/profile", handler.BaseMiddleware(

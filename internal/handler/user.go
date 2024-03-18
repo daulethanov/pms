@@ -87,8 +87,8 @@ func generateEditPasswordCode()int{
 
 }
 
-var messageCodeEditPassword map[int]string
-var urlEditPassword map[string]string
+var MessageCodeEditPassword = make(map[int]string)
+var UrlEditPassword = make(map[string]string)
 
 func (p *ProfileHandler)EditPassword(w http.ResponseWriter, r *http.Request){
 	decoder := json.NewDecoder(r.Body)
@@ -104,15 +104,18 @@ func (p *ProfileHandler)EditPassword(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	
-    code := generateEditPasswordCode()
     if err := p.servie.EditPassword(body.Email); err != nil{
 		http.Error(w, "Ошибка email", http.StatusBadRequest)
+		return
 
 	}
+	code := generateEditPasswordCode()
+   
     if err = mail.SendMessageEditPassword(body.Email, code); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
-	messageCodeEditPassword[code] = body.Email
+	MessageCodeEditPassword[code] = body.Email
 
 	
 	w.WriteHeader(http.StatusOK)
@@ -128,16 +131,33 @@ func (a *ProfileHandler) EditPasswordCode(w http.ResponseWriter, r *http.Request
 		return
 	}
 	
-	email, ok := messageCodeEditPassword[body.Code]
+	email, ok := MessageCodeEditPassword[body.Code]
 	urlConfirmEditPassword := uuid.New().String()
-	urlEditPassword[urlConfirmEditPassword] = email
+	UrlEditPassword[urlConfirmEditPassword] = email
     if !ok {
         http.Error(w, "Неверный код подтверждения", http.StatusBadRequest)
         return
     }
-	delete(messageCodeEditPassword, body.Code)
+	delete(MessageCodeEditPassword, body.Code)
 	
-
+	response := map[string]string{
+		"url": urlConfirmEditPassword,
+		
+	}
+	responseData, err := json.Marshal(response)
+    if err != nil {
+        http.Error(w, "Ошибка сериализации данных", http.StatusInternalServerError)
+        return
+    }
+	w.Header().Set("Content-Type", "application/json")
+    
+    w.WriteHeader(http.StatusOK)
+    
+    _, err = w.Write(responseData)
+    if err != nil {
+        http.Error(w, "Ошибка отправки данных", http.StatusInternalServerError)
+        return
+    }
 	w.WriteHeader(http.StatusOK)
 
 }
@@ -154,7 +174,7 @@ func (a *ProfileHandler) EditPasswordConfirm(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
 	}
-	email, ok := urlEditPassword[slug]
+	email, ok := UrlEditPassword[slug]
 	if !ok {
         http.Error(w, "Неверный код подтверждения", http.StatusBadRequest)
         return
@@ -163,5 +183,6 @@ func (a *ProfileHandler) EditPasswordConfirm(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "не удалось изменит пароль", http.StatusBadRequest)
         return
 	}
+	delete(UrlEditPassword, slug)
 	w.WriteHeader(http.StatusOK)
 }
