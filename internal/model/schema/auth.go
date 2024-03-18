@@ -18,3 +18,13 @@ type NewTokenSchema struct{
 type EditPasswordSchema struct {
 	Email    string `json:"email"`
 }
+
+type EditPasswordCodeSchema struct {
+	Code    int `json:"code"`
+}
+
+
+type EditPasswordConfirmSchema struct {
+	Password string `json:"password"`
+}
+

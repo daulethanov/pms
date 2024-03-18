@@ -28,6 +28,7 @@ func HttpServer(userCollection, projectCollection, taskLevelCollection *mongo.Co
 			auth.HandleFunc("/sign-up", authHandler.SignUp).Methods("POST")
 			auth.HandleFunc("/sign-in", authHandler.SignIn).Methods("POST")
 			auth.HandleFunc("/refresh", authHandler.NewJwtToken).Methods("POST")
+			auth.HandleFunc("/edit/password", profileHandler.EditPassword).Methods("POST")
 		
 		}
 		{
@@ -35,6 +36,7 @@ func HttpServer(userCollection, projectCollection, taskLevelCollection *mongo.Co
 				http.HandlerFunc(profileHandler.ViewProfile))).Methods("GET")
 			auth.Handle("/profile/edit/image", handler.BaseMiddleware(
 				http.HandlerFunc(profileHandler.EditImageProfile))).Methods("POST")
+
 		}	
 		project := api.PathPrefix("/project").Subrouter()
 		{

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"mime/multipart"
-	"regexp"
 	"time"
 	"todo/internal/model"
 	"github.com/google/uuid"
@@ -17,9 +16,10 @@ import (
 type AuthServiceInterface interface {
 	CreateUser(email string, password string) (string, error)
 	LoginUser(email string, password string) (string, error)
-	EmailValidate(email string) error
 	ViewProfile(id string) (*model.User, error)
 	EditImageProfile(userID string, imageFile multipart.File, size int64) error
+	EditPassword(email string) error
+	ConfirmEditPassword(email, password string) error
 }
 
 type AuthService struct {
@@ -34,15 +34,7 @@ func NewAuthService(userCollection *mongo.Collection, minioClient *minio.Client)
 	}
 }
 
-func (a *AuthService) EmailValidate(email string) error {
-	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	re := regexp.MustCompile(pattern)
-	if re.MatchString(email) {
-		return nil
-	} else {
-		return errors.New("неверный формат email")
-	}
-}
+
 
 func (a *AuthService) CreateUser(email string, password string) (string, error) {
 	existingUser := a.userCollection.FindOne(context.TODO(), bson.M{"email": email})
@@ -131,3 +123,24 @@ func (a *AuthService) EditImageProfile(userID string, imageFile multipart.File, 
 	return nil
 }
 
+func (a *AuthService) EditPassword(email string) error{
+	var user model.User
+	err := a.userCollection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&user)
+	if err != nil{
+		return err
+	}
+	return nil
+}
+
+func (a *AuthService) ConfirmEditPassword(email ,password string) error{
+	var user model.User
+	filter := bson.M{"email": email}
+	user.PasswordHash(password)
+	update := bson.M{"$set": bson.M{"password": user.Password}}
+	
+	_, err := a.userCollection.UpdateOne(context.TODO(), filter, update)
+		if err != nil{
+		return err
+	}
+	return nil
+}

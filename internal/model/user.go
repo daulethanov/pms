@@ -4,7 +4,8 @@ import (
 	"time"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
-	
+	"regexp"
+	"errors"
 )
 
 type User struct{
@@ -48,3 +49,12 @@ func (u *User) BaseUsername(email string) {
 }
 
 
+func EmailValidate(email string) error {
+	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(pattern)
+	if re.MatchString(email) {
+		return nil
+	} else {
+		return errors.New("неверный формат email")
+	}
+}

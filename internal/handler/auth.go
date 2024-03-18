@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"todo/internal/model"
 	"todo/internal/model/schema"
 	"todo/internal/service"
 	"todo/pkg/jwt"
@@ -32,7 +33,7 @@ func (a *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
 	}
-	if err = a.service.EmailValidate(body.Email); err != nil {
+	if err = model.EmailValidate(body.Email); err != nil {
 		http.Error(w, "Ошибка валидации Email", http.StatusBadRequest)
 		return
 	}
@@ -82,7 +83,7 @@ func (a *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
 	}
-	if err = a.service.EmailValidate(body.Email); err != nil {
+	if err = model.EmailValidate(body.Email); err != nil {
 		http.Error(w, "Ошибка валидации Email", http.StatusBadRequest)
 		return
 	}

@@ -10,6 +10,7 @@ minio:
   access-key: ${MINIO_ACCESS_KEY}
 
 smtp:
+  username: ${SMTP_USERNAME}
   smtp: ${SMTP_SERVER}
   port: ${SMTP_PORT}
   email: ${SMTP_EMAIL}
