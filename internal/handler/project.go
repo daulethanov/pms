@@ -5,30 +5,25 @@ import (
 	"net/http"
 	"todo/internal/model/schema"
 	"todo/internal/service"
-
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
 
-type ProjectHandlerInterface interface{
+type ProjectHandlerInterface interface {
 	TaskEdit(w http.ResponseWriter, r *http.Request)
 	CreateProjectRoom(w http.ResponseWriter, r *http.Request)
 	DetailProjectView(w http.ResponseWriter, r *http.Request)
 }
 
-type ProjectHandler struct{
+type ProjectHandler struct {
 	service service.ProjectServiceInterface
 }
 
-func NewProjectHandler(service service.ProjectServiceInterface)ProjectHandlerInterface{
+func NewProjectHandler(service service.ProjectServiceInterface) ProjectHandlerInterface {
 	return &ProjectHandler{
 		service: service,
 	}
 }
-
-
-
-
 
 func (p *ProjectHandler) CreateProjectRoom(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
@@ -39,20 +34,20 @@ func (p *ProjectHandler) CreateProjectRoom(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
 	}
-	if err := p.service.CreateProject(&body ,userID) ;err != nil{
+	if err := p.service.CreateProject(&body, userID); err != nil {
 		http.Error(w, "Ошибка при создание проекта", http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (p *ProjectHandler) DetailProjectView(w http.ResponseWriter, r *http.Request){
+func (p *ProjectHandler) DetailProjectView(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-    projectID := vars["id"]
+	projectID := vars["id"]
 	project, err := p.service.DetailProject(projectID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Ошибка при просмотре проекта", http.StatusBadRequest)
-		return 
+		return
 	}
 	response := map[string]string{
 		"name": project.Name,
@@ -60,30 +55,29 @@ func (p *ProjectHandler) DetailProjectView(w http.ResponseWriter, r *http.Reques
 	}
 	responseData, err := json.Marshal(response)
 	if err != nil {
-        http.Error(w, "Ошибка сериализации данных", http.StatusInternalServerError)
-        return
-    }
+		http.Error(w, "Ошибка сериализации данных", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-    
-    _, err = w.Write(responseData)
-    if err != nil {
-        http.Error(w, "Ошибка отправки данных", http.StatusInternalServerError)
-        return
-    }
+
+	_, err = w.Write(responseData)
+	if err != nil {
+		http.Error(w, "Ошибка отправки данных", http.StatusInternalServerError)
+		return
+	}
 }
 
-func (p *ProjectHandler) TaskEdit(w http.ResponseWriter, r *http.Request){
+func (p *ProjectHandler) TaskEdit(w http.ResponseWriter, r *http.Request) {
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
 	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil{ 
+	if err != nil {
 		http.Error(w, "Ошибка отправки данных", http.StatusInternalServerError)
-        return
+		return
 	}
 	defer conn.Close()
-	
-	
+
 }

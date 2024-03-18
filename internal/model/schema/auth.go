@@ -14,3 +14,7 @@ type LoginUserSchema struct {
 type NewTokenSchema struct{
 	RefreshToken string `json:"refresh_token"`
 }
+
+type EditPasswordSchema struct {
+	Email    string `json:"email"`
+}

@@ -34,6 +34,7 @@ type Task struct {
 	CretedAt      time.Time            `bson:"created_at"`
 	UpdatedAt     time.Time            `bson:"updated_at"`
 	LevelStage    string               `bson:"stage_level"`
-
+	Image         []string             `bson:"image"`
+	File          []string             `bson:"file"`
 }
 

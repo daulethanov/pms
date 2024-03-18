@@ -2,14 +2,16 @@ package handler
 
 import (
 	"encoding/json"
-	"net/http"
-	"todo/internal/service"
 	"log"
+	"net/http"
+	"todo/internal/model/schema"
+	"todo/internal/service"
 )
 
 type ProfileHandlerInterface interface {
 	ViewProfile(w http.ResponseWriter, r *http.Request)
 	EditImageProfile(w http.ResponseWriter, r *http.Request)
+	EditPassword(w http.ResponseWriter, r *http.Request)
 }
 
 type ProfileHandler struct {
@@ -45,7 +47,7 @@ func (a *ProfileHandler) ViewProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *ProfileHandler) EditImageProfile(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(20 << 30)
+	err := r.ParseMultipartForm(20 << 20)
 	userID := r.Context().Value("id").(string)
 	if err != nil {
 		http.Error(w, "Пользователь не найден", http.StatusUnauthorized)
@@ -67,3 +69,15 @@ func (a *ProfileHandler) EditImageProfile(w http.ResponseWriter, r *http.Request
 	}
 	w.WriteHeader(http.StatusOK)
 }
+
+func (p *ProfileHandler)EditPassword(w http.ResponseWriter, r *http.Request){
+	decoder := json.NewDecoder(r.Body)
+	body := schema.EditPasswordSchema{}
+
+	err := decoder.Decode(&body)
+	if err != nil{ 
+		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
+		return
+	}
+	
+} 

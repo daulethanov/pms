@@ -1,10 +1,16 @@
 mongo:
-  host: "localhost"
-  port: "27017"
-  username: "admin"
-  password: "admin"
+  host: ${MONGO_HOST}
+  port: ${MONGO_PORT}
+  username: ${MONGO_USERNAME}
+  password: ${MONGO_PASSWORD}
   
 minio:
-  endpoint: "127.0.0.1:9000"
-  secret-key: "aIJkqHj3syTBtKuLyk6ijaCXwvRNnuVDd3HBGUt3"
-  access-key: "9nHluHVlvUzTCh18jLEg"
+  endpoint: ${MINIO_HOST}
+  secret-key: ${MINIO_SECRET_KEY}
+  access-key: ${MINIO_ACCESS_KEY}
+
+smtp:
+  smtp: ${SMTP_SERVER}
+  port: ${SMTP_PORT}
+  email: ${SMTP_EMAIL}
+  password: ${SMTP_PASSWORD}

@@ -9,12 +9,17 @@ import (
 )
 
 func init(){
-	err := config.GoYamlParse()
+	err := config.GoEnvParse()
+	if err != nil {
+		log.Fatal("Error parse ENV", err)
+	}
+
+	err = config.GoYamlParse()
 	if err != nil {
 		log.Fatal("Error parse YAML", err)
 	}
-}
 
+}
 
 func main() {
 	mongo, err := mongo.NewMongoClient()
