@@ -29,6 +29,10 @@ func (a *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	body := schema.CreateUserSchema{}
 	err := decoder.Decode(&body)
+	if err := body.Validate();err != nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
@@ -79,6 +83,10 @@ func (a *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	body := schema.LoginUserSchema{}
 	err := decoder.Decode(&body)
+	if err := body.Validate();err != nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
@@ -90,6 +98,7 @@ func (a *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	user_id, err := a.service.LoginUser(body.Email, body.Password)
 	if err != nil{
 		http.Error(w, "Не верный логин или пароль", http.StatusUnauthorized)
+		return
 	}
 	
 	access, err := jwt.JWTGenearate(user_id, body.Email)
@@ -128,6 +137,10 @@ func (a *AuthHandler) NewJwtToken(w http.ResponseWriter, r *http.Request){
 	decoder := json.NewDecoder(r.Body)
 	body := schema.NewTokenSchema{} 
 	err := decoder.Decode(&body)
+	if err := body.Validate();err != nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return

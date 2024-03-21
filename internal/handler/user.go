@@ -93,8 +93,12 @@ var UrlEditPassword = make(map[string]string)
 func (p *ProfileHandler)EditPassword(w http.ResponseWriter, r *http.Request){
 	decoder := json.NewDecoder(r.Body)
 	body := schema.EditPasswordSchema{}
-
+	
 	err := decoder.Decode(&body)
+	if err := body.Validate();err != nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil{ 
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
@@ -124,8 +128,12 @@ func (p *ProfileHandler)EditPassword(w http.ResponseWriter, r *http.Request){
 func (a *ProfileHandler) EditPasswordCode(w http.ResponseWriter, r *http.Request){
 	decoder := json.NewDecoder(r.Body)
 	body := schema.EditPasswordCodeSchema{}
-
+	
 	err := decoder.Decode(&body)
+	if err := body.Validate();err != nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil{ 
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
@@ -168,12 +176,17 @@ func (a *ProfileHandler) EditPasswordConfirm(w http.ResponseWriter, r *http.Requ
 	slug := vars["slug"]
 	decoder := json.NewDecoder(r.Body)
 	body := schema.EditPasswordConfirmSchema{}
-
+	
 	err := decoder.Decode(&body)
+	if err := body.Validate();err != nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil{ 
 		http.Error(w, "Ошибка разбора JSON", http.StatusBadRequest)
 		return
 	}
+	
 	email, ok := UrlEditPassword[slug]
 	if !ok {
         http.Error(w, "Неверный код подтверждения", http.StatusBadRequest)
